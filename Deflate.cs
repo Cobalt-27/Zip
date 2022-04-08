@@ -50,10 +50,7 @@ namespace Zip
                 if (offset>4&&offset <= 32000)
                 {
                     int length = 4 + GetLength(idx-offset+ 4, idx + 4);
-                    //int length = 4;
-                    Console.WriteLine($"idx {idx} pre {idx - offset} offset {offset} length {length}");
-                    if (offset < length)
-                        continue;
+                    //Console.WriteLine($"idx {idx} pre {idx - offset} offset {offset} length {length}");
                     w.WriteBits(StaticHuffman.Length(length));
                     w.WriteBits(StaticHuffman.Offset(offset));
                     for(int j=idx+1;j< idx+length; j++)
