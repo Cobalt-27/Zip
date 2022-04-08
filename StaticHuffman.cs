@@ -99,7 +99,7 @@ namespace Zip
             int slot = deflate_length_slot[length];
             int code = slot + 257;
             int extra = length - deflate_length_slot_base[slot];
-            var extraBits = ToBinary(extra, deflate_extra_length_bits[slot]);
+            var extraBits = ToBinary(extra, deflate_extra_length_bits[slot]).Reverse();
             if (257 <= code && code <= 279)
             {
                 return ToBinary(code - 256, 7).Concat(extraBits).ToArray();

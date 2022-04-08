@@ -49,9 +49,9 @@ namespace Zip
                 dict[hash] = idx;
                 if (offset>4&&offset <= 32000)
                 {
-                    int length = 4 + GetLength(dict[hash] + 4, idx + 4);
+                    int length = 4 + GetLength(idx-offset+ 4, idx + 4);
                     //int length = 4;
-                    //Console.WriteLine($"idx {idx} pre {idx-offset} offset {offset} length {length}");
+                    Console.WriteLine($"idx {idx} pre {idx - offset} offset {offset} length {length}");
                     if (offset < length)
                         continue;
                     w.WriteBits(StaticHuffman.Length(length));
