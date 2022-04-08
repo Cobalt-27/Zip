@@ -38,20 +38,21 @@ namespace Zip
             int idx = 0;
             while (idx < data.Count)
             {
-                if (true)
+                if (idx>data.Count-10)
                 {
                     w.WriteBits(StaticHuffman.Literal(data[idx]));
                     idx++;
                     continue;
                 }
                 var hash = Hash(idx);
-                int distance = dict.ContainsKey(hash)?idx - dict[hash]:int.MaxValue;
+                int offset = dict.ContainsKey(hash)?idx - dict[hash]:int.MaxValue;
                 dict[hash] = idx;
-                if (distance <= 32768)
+                if (offset <= 32768)
                 {
                     int length = 4 + GetLength(dict[hash] + 4, idx + 4);
-                    w.WriteBits(StaticHuffman.Distance(distance));
+                    Console.WriteLine($"idx {idx} pre {idx-offset} offset {offset} length {length}");
                     w.WriteBits(StaticHuffman.Length(length));
+                    w.WriteBits(StaticHuffman.Offset(offset));
                     for(int j=idx+1;j< idx+length; j++)
                         dict[Hash(j)] = j;
                     idx += length;

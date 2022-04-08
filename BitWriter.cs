@@ -29,7 +29,7 @@ namespace Zip
         }
         public void Emit()
         {
-            Console.WriteLine($"write byte {value}");
+            //Console.WriteLine($"write byte {value}");
             MemoryStream.WriteByte((byte)value);
             value = 0;
             len = 0;
