@@ -2,8 +2,10 @@
 using Zip;
 using Force.Crc32;
 
-string name = "test.txt";
-string dst = "test.zip";
+//string name = "test.txt";
+//string dst = "test.zip";
+string name = "HttpServer.dll";
+string dst = "http.zip";
 var data = new List<byte>();
 
 using (var stream = File.Open(name, FileMode.Open))

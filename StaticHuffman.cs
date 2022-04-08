@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -68,6 +69,7 @@ namespace Zip
             //res.ForEach(x => Console.Write($" {x}"));
             //Console.WriteLine();
             res.Reverse();
+            Debug.Assert(res.Count == n);
             return res.ToArray();
         }
         public static int[] Literal(int literal)
@@ -86,9 +88,11 @@ namespace Zip
             int slot = 0;
             while(slot< deflate_offset_slot_base.Length - 1 && deflate_offset_slot_base[slot + 1] <= offset)
                 slot++;
+            Console.WriteLine($"offset {offset} slot {slot}");
             int extra=offset - deflate_offset_slot_base[slot];
             var extraBits = ToBinary(extra, deflate_extra_offset_bits[slot]);
-            return ToBinary(slot, 5).Concat(extraBits).ToArray();
+            var res=ToBinary(slot, 5).Concat(extraBits.Reverse()).ToArray();
+            return res;
         }
         public static int[] Length(int length)
         {

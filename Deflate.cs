@@ -38,7 +38,7 @@ namespace Zip
             int idx = 0;
             while (idx < data.Count)
             {
-                if (idx>data.Count-10)
+                if (idx>=data.Count-5)
                 {
                     w.WriteBits(StaticHuffman.Literal(data[idx]));
                     idx++;
@@ -47,21 +47,22 @@ namespace Zip
                 var hash = Hash(idx);
                 int offset = dict.ContainsKey(hash)?idx - dict[hash]:int.MaxValue;
                 dict[hash] = idx;
-                if (offset <= 32768)
+                if (offset>4&&offset <= 32000)
                 {
                     int length = 4 + GetLength(dict[hash] + 4, idx + 4);
-                    Console.WriteLine($"idx {idx} pre {idx-offset} offset {offset} length {length}");
+                    //int length = 4;
+                    //Console.WriteLine($"idx {idx} pre {idx-offset} offset {offset} length {length}");
+                    if (offset < length)
+                        continue;
                     w.WriteBits(StaticHuffman.Length(length));
                     w.WriteBits(StaticHuffman.Offset(offset));
                     for(int j=idx+1;j< idx+length; j++)
                         dict[Hash(j)] = j;
                     idx += length;
+                    continue;
                 }
-                else
-                {
-                    w.WriteBits(StaticHuffman.Literal(data[idx]));
-                    idx++;
-                }
+                w.WriteBits(StaticHuffman.Literal(data[idx]));
+                idx++;
             }
             w.WriteBits(StaticHuffman.Literal(256));
             w.Emit();

@@ -15,7 +15,7 @@ namespace Zip
         {
             MemoryStream = stream;
         }
-        public void WriteBits(IEnumerable<int> bits)
+        public void WriteBits(IList<int> bits)
         {
             bits.ToList().ForEach(x =>WriteBit(x));
         }
@@ -30,7 +30,8 @@ namespace Zip
         public void Emit()
         {
             //Console.WriteLine($"write byte {value}");
-            MemoryStream.WriteByte((byte)value);
+            if(len!=0)
+                MemoryStream.WriteByte((byte)value);
             value = 0;
             len = 0;
         }
