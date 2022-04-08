@@ -17,17 +17,31 @@ using (var stream = File.Open(dst, FileMode.Create))
 {
     using (var w = new BinaryWriter(stream))
     {
+        var ms=new MemoryStream();
+        var bw=new BitWriter(ms);
+        var deflate = new Deflate(data);
+        ushort method = 8;
+        deflate.Write(bw);
+        uint compressedSize = (uint)bw.MemoryStream.Length;
+        Console.WriteLine($"Compressed: {compressedSize}");
         uint crc32 = Crc32Algorithm.Compute(data.ToArray(), 0, data.Count);
         uint uncompressedSize = (uint)data.Count;
-        uint compressedSize = (uint)data.Count;
-        var localh = new LocalHeader(0, crc32, compressedSize, uncompressedSize, name);
+
+        var localh = new LocalHeader(8, crc32, compressedSize, uncompressedSize, name);
         localh.Write(w);
 
-        w.Write(data.ToArray());
+        if (method == 0)
+        {
+            w.Write(data.ToArray());
+        }
+        else
+        {
+            w.Write(bw.MemoryStream.ToArray());
+        }
 
         uint start=(uint)w.BaseStream.Position;
         Console.WriteLine($"Start is {start}");
-        var record = new CentralDirectoryRecord(0, crc32, compressedSize, uncompressedSize, name);
+        var record = new CentralDirectoryRecord(8, crc32, compressedSize, uncompressedSize, name);
         record.Write(w);
 
         var end = new CentralDirectoryRecordEnd(record.Size, start);

@@ -13,17 +13,11 @@ namespace Zip
         private readonly ushort flag = 0;
         private ushort method;
         private ushort time {
-            get
-            {
-                return 0;
-            }
+            get => 0;
         }
         private ushort date
         {
-            get
-            {
-                return 0;
-            }
+            get => 0;
         }
         private uint crc32 = 0;
         private uint compressedSize = 0;
@@ -33,7 +27,7 @@ namespace Zip
             get => (ushort)name.Length;
         }
         private readonly ushort extraField = 0;
-        private string name;
+        private readonly string name;
 
         public LocalHeader(ushort method,uint crc32,uint compressedSize,uint uncompressedSize,string name)
         {

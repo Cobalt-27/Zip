@@ -15,6 +15,7 @@ namespace Zip
         private readonly ushort totalNumberOfEntries = 1;
         private readonly uint sizeOfTheCentralDirectory;
         private readonly uint startOfCentralDirectory;
+        private readonly ushort commentLength = 0;
 
         public CentralDirectoryRecordEnd(uint size,uint start)
         {
@@ -31,6 +32,7 @@ namespace Zip
             w.Write(totalNumberOfEntries);
             w.Write(sizeOfTheCentralDirectory);
             w.Write(startOfCentralDirectory);
+            w.Write(commentLength);
         }
     }
 }
