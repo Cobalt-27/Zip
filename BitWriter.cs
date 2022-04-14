@@ -16,7 +16,7 @@ namespace Zip
         public void WriteBits(IList<int> bits) => bits.ToList().ForEach(x => WriteBit(x));
         public void WriteBit(int x)
         {
-            Debug.Assert(x == 1 || x == 2);
+            Debug.Assert(x == 0 || x == 1);
             value |= x << len;
             if (++len >= 8)
                 Emit();

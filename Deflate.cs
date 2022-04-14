@@ -17,7 +17,7 @@ namespace Zip
         }
         private (byte, byte, byte) Hash(int idx)
         {
-            Debug.Assert(idx + 2 >= data.Count);
+            Debug.Assert(idx + 2 < data.Count);
             return (data[idx], data[idx + 1], data[idx + 2]);
         }
         private int GetLength(int idx1, int idx2)
@@ -49,7 +49,7 @@ namespace Zip
                 dict[hash] = idx;
                 if (offset>4&&offset <= 32768)
                 {
-                    int length = 4 + GetLength(idx-offset+ 4, idx + 4);
+                    int length = 3 + GetLength(idx-offset+ 3, idx + 3);
                     //Console.WriteLine($"idx {idx} pre {idx - offset} offset {offset} length {length}");
                     w.WriteBits(StaticHuffman.Length(length));
                     w.WriteBits(StaticHuffman.Offset(offset));
