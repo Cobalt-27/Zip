@@ -59,7 +59,6 @@ namespace Zip
             w.Write(relativeOffsetOfLocalHeader);
             w.Write(Encoding.UTF8.GetBytes(name));
             Size=(uint)(w.BaseStream.Position-start);
-            Console.WriteLine($"Size of Directory: {Size}");
         }
     }
 }

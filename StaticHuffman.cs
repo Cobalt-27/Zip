@@ -54,30 +54,17 @@ namespace Zip
         };
 
         #endregion
-        public static int[] ToBinary(int x, int n)
-        {
-            var res = new List<int>();
-            while (x > 0)
-            {
-                res.Add(x & 1);
-                if (res.Count > n)
-                    throw new Exception();
-                x >>= 1;
-            }
-            while (res.Count < n)
-                res.Add(0);
-            //res.ForEach(x => Console.Write($" {x}"));
-            //Console.WriteLine();
-            res.Reverse();
-            Debug.Assert(res.Count == n);
-            return res.ToArray();
-        }
+        public static IList<int> GetBits(int x) 
+            => new BitArray(new int[] { x })
+            .Cast<bool>()
+            .Select(b=>b?1:0)
+            .ToList();
         public static int[] Literal(int literal)
         {
             if (literal >= 0 && literal <= 143)
-                return ToBinary(0b00110000 + literal, 8);
+                return GetBits(0b00110000 + literal).Take(8).Reverse().ToArray();
             else if (literal >= 144 && literal <= 255)
-                return ToBinary(0b110010000 + (literal - 144), 9);
+                return GetBits(0b110010000 + (literal - 144)).Take(9).Reverse().ToArray();
             else if (literal == 256)
                 return new int[7];
             else
@@ -86,32 +73,37 @@ namespace Zip
         public static int[] Offset(int offset)
         {
             int slot = 0;
-            while(slot< deflate_offset_slot_base.Length - 1 && deflate_offset_slot_base[slot + 1] <= offset)
+            while (slot < deflate_offset_slot_base.Length - 1 && deflate_offset_slot_base[slot + 1] <= offset)
                 slot++;
-            Console.WriteLine($"offset {offset} slot {slot}");
-            int extra=offset - deflate_offset_slot_base[slot];
-            var extraBits = ToBinary(extra, deflate_extra_offset_bits[slot]);
-            var res=ToBinary(slot, 5).Concat(extraBits.Reverse()).ToArray();
+            var extraBits = GetBits(offset - deflate_offset_slot_base[slot])
+                .Take(deflate_extra_offset_bits[slot]);
+            var res = GetBits(slot)
+                .Take(5)
+                .Reverse()
+                .Concat(extraBits)
+                .ToArray();
             return res;
         }
         public static int[] Length(int length)
         {
             int slot = deflate_length_slot[length];
             int code = slot + 257;
-            int extra = length - deflate_length_slot_base[slot];
-            var extraBits = ToBinary(extra, deflate_extra_length_bits[slot]).Reverse();
+            var extraBits = GetBits(length - deflate_length_slot_base[slot])
+                .Take(deflate_extra_length_bits[slot]);
             if (257 <= code && code <= 279)
-            {
-                return ToBinary(code - 256, 7).Concat(extraBits).ToArray();
-            }
+                return GetBits(code - 256)
+                    .Take(7)
+                    .Reverse()
+                    .Concat(extraBits)
+                    .ToArray();
             else if (280 <= code && code <= 287)
-            {
-                return ToBinary(0b11000000 + code - 280, 8).Concat(extraBits).ToArray();
-            }
+                return GetBits(0b11000000 + code - 280)
+                    .Take(8)
+                    .Reverse()
+                    .Concat(extraBits)
+                    .ToArray();
             else
-            {
                 throw new Exception();
-            }
         }
     }
 }

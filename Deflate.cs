@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,16 +10,15 @@ namespace Zip
     public class Deflate
     {
         private IList<byte> data;
-        private Dictionary<(byte, byte, byte, byte), int> dict = new Dictionary<(byte, byte, byte, byte), int>();
+        private Dictionary<(byte, byte, byte), int> dict = new Dictionary<(byte, byte, byte), int>();
         public Deflate(IList<byte> data)
         {
             this.data = data;
         }
-        private (byte, byte, byte, byte) Hash(int idx)
+        private (byte, byte, byte) Hash(int idx)
         {
-            if (idx + 4 > data.Count)
-                throw new ArgumentException();
-            return (data[idx], data[idx + 1], data[idx + 2], data[idx + 3]);
+            Debug.Assert(idx + 2 >= data.Count);
+            return (data[idx], data[idx + 1], data[idx + 2]);
         }
         private int GetLength(int idx1, int idx2)
         {
@@ -38,7 +38,7 @@ namespace Zip
             int idx = 0;
             while (idx < data.Count)
             {
-                if (idx>=data.Count-5)
+                if (idx>=data.Count-6)
                 {
                     w.WriteBits(StaticHuffman.Literal(data[idx]));
                     idx++;
@@ -47,7 +47,7 @@ namespace Zip
                 var hash = Hash(idx);
                 int offset = dict.ContainsKey(hash)?idx - dict[hash]:int.MaxValue;
                 dict[hash] = idx;
-                if (offset>4&&offset <= 32000)
+                if (offset>4&&offset <= 32768)
                 {
                     int length = 4 + GetLength(idx-offset+ 4, idx + 4);
                     //Console.WriteLine($"idx {idx} pre {idx - offset} offset {offset} length {length}");

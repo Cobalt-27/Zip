@@ -2,12 +2,9 @@
 using Zip;
 using Force.Crc32;
 
-//string name = "test.txt";
-//string dst = "test.zip";
 string name = "HttpServer.dll";
 string dst = "http.zip";
 var data = new List<byte>();
-
 using (var stream = File.Open(name, FileMode.Open))
 {
     var ms= new MemoryStream();
@@ -25,7 +22,7 @@ using (var stream = File.Open(dst, FileMode.Create))
         ushort method = 8;
         deflate.Write(bw);
         uint compressedSize = (uint)bw.MemoryStream.Length;
-        Console.WriteLine($"Compressed: {compressedSize}");
+        Console.WriteLine($"Compressed size: {compressedSize}");
         uint crc32 = Crc32Algorithm.Compute(data.ToArray(), 0, data.Count);
         uint uncompressedSize = (uint)data.Count;
 
@@ -33,16 +30,11 @@ using (var stream = File.Open(dst, FileMode.Create))
         localh.Write(w);
 
         if (method == 0)
-        {
             w.Write(data.ToArray());
-        }
         else
-        {
             w.Write(bw.MemoryStream.ToArray());
-        }
 
         uint start=(uint)w.BaseStream.Position;
-        Console.WriteLine($"Start is {start}");
         var record = new CentralDirectoryRecord(8, crc32, compressedSize, uncompressedSize, name);
         record.Write(w);
 
